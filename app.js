@@ -81,6 +81,38 @@ app.get(
   }
 );
 
+app.post(
+  "/api/countries",
+  countryValidationRules,
+  handleValidationErrors,
+  (req, res) => {
+    const { name, alpha2Code, alpha3Code, visited } = req.body;
+
+    // Check if the country already exists
+    const existingCountry = countryList.find(
+      (country) =>
+        country.alpha2Code === alpha2Code || country.alpha3Code === alpha3Code
+    );
+
+    if (existingCountry) {
+      return res
+        .status(409)
+        .json({ message: "Country already exists in the list." });
+    }
+
+    // Add the new country
+    const newCountry = {
+      id: countryList.length + 1,
+      name: name,
+      alpha2Code: alpha2Code,
+      alpha3Code: alpha3Code,
+      visited: visited || false,
+    };
+
+    countryList.push(newCountry);
+    res.status(201).json(newCountry);
+  }
+);
 
 
 app.listen(port, () => {
