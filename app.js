@@ -81,6 +81,8 @@ app.get(
   }
 );
 
+
+
 app.post(
   "/api/countries",
   countryValidationRules,
@@ -111,6 +113,32 @@ app.post(
 
     countryList.push(newCountry);
     res.status(201).json(newCountry);
+  }
+);
+
+app.put(
+  "/api/countries/:code",
+  countryValidationRules,
+  handleValidationErrors,
+  (req, res) => {
+    const code = req.params.code.toUpperCase(); // Convert the code to uppercase
+
+    // Find the index of the country based on alpha2Code or alpha3Code
+    const countryIndex = countryList.findIndex(
+      (country) => country.alpha2Code === code || country.alpha3Code === code
+    );
+
+    if (countryIndex === -1) {
+      return res.status(404).json({ message: "Country not found." });
+    }
+
+    // Update the country data
+    countryList[countryIndex] = {
+      ...countryList[countryIndex], // Keep existing properties
+      ...req.body, // Update with new properties
+    };
+
+    res.json(countryList[countryIndex]);
   }
 );
 
