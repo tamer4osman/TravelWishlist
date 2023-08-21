@@ -63,6 +63,25 @@ const handleValidationErrors = (req, res, next) => {
 
 const port = process.env.PORT || 3000;
 
+app.get(
+  " /api/countries",
+  countryValidationRules,
+  handleValidationErrors,
+  (req, res) => {
+    let sortedCountries = countryList.slice();
+    const sortParam = req.query.sort;
+
+    if (sortParam && sortParam.toLowerCase() === "true") {
+      sortedCountries = sortedCountries.sort((a, b) =>
+        a.name.localeCompare(b.name)
+      );
+    }
+
+    res.json(sortedCountries);
+  }
+);
+
+
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
