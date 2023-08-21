@@ -81,7 +81,25 @@ app.get(
   }
 );
 
+app.get(
+  " /api/countries/:code",
+  countryValidationRules,
+  handleValidationErrors,
+  (req, res) => {
+    const code = req.params.code.toUpperCase(); // Convert the code to uppercase
+    console.log(code);
+    // Find the country based on alpha2Code or alpha3Code
+    const country = countryList.find(
+      (country) => country.alpha2Code === code || country.alpha3Code === code
+    );
 
+    if (!country) {
+      return res.status(404).json({ message: "Country not found." });
+    }
+
+    res.json(country);
+  }
+);
 
 app.post(
   "/api/countries",
@@ -141,6 +159,7 @@ app.put(
     res.json(countryList[countryIndex]);
   }
 );
+
 
 
 app.listen(port, () => {
