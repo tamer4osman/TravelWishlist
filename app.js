@@ -160,7 +160,28 @@ app.put(
   }
 );
 
+app.delete(
+  "/api/countries/:code",
+  countryValidationRules,
+  handleValidationErrors,
+  (req, res) => {
+    const code = req.params.code.toUpperCase(); // Convert the code to uppercase
 
+    // Find the index of the country based on alpha2Code or alpha3Code
+    const countryIndex = countryList.findIndex(
+      (country) => country.alpha2Code === code || country.alpha3Code === code
+    );
+
+    if (countryIndex === -1) {
+      return res.status(404).json({ message: "Country not found." });
+    }
+
+    // Update the "visited" status of the country
+    countryList[countryIndex].visited = true;
+
+    res.json(countryList[countryIndex]);
+  }
+);
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
