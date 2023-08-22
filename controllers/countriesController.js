@@ -1,42 +1,6 @@
 const { validationResult, body } = require("express-validator");
-
-const countryList = [
-  {
-    id: 1,
-    name: "Bhutan",
-    alpha2Code: "BT",
-    alpha3Code: "BTN",
-    visited: false,
-  },
-  {
-    id: 2,
-    name: "Canada",
-    alpha2Code: "CA",
-    alpha3Code: "CAN",
-    visited: false,
-  },
-  {
-    id: 3,
-    name: "Australia",
-    alpha2Code: "AU",
-    alpha3Code: "AUS",
-    visited: true,
-  },
-  {
-    id: 4,
-    name: "Japan",
-    alpha2Code: "JP",
-    alpha3Code: "JPN",
-    visited: false,
-  },
-  {
-    id: 5,
-    name: "United Kingdom",
-    alpha2Code: "GB",
-    alpha3Code: "GBR",
-    visited: true,
-  },
-];
+const fs = require("fs"); // Import the "fs" module
+const countryData = require("../data/countryData.json"); // Load country data from JSON file
 
 const countryValidationRules = [
   body("name")
@@ -64,8 +28,12 @@ const handleValidationErrors = (req, res, next) => {
   next();
 };
 
+function updateCountryDataFile() {
+  fs.writeFileSync("./countryData.json", JSON.stringify(countryData, null, 2));
+}
+
 const getCountries = (req, res) => {
-  let sortedCountries = countryList.slice();
+  let sortedCountries = countryData.slice(); // Use countryData instead of countryList
   const sortParam = req.query.sort;
 
   if (sortParam && sortParam.toLowerCase() === "true") {
@@ -78,10 +46,8 @@ const getCountries = (req, res) => {
 };
 
 const getCountryByCode = (req, res) => {
-  const code = req.params.code.toUpperCase(); // Convert the code to uppercase
-  console.log(code);
-  // Find the country based on alpha2Code or alpha3Code
-  const country = countryList.find(
+  const code = req.params.code.toUpperCase();
+  const country = countryData.find(
     (country) => country.alpha2Code === code || country.alpha3Code === code
   );
 
@@ -95,8 +61,7 @@ const getCountryByCode = (req, res) => {
 const createCountry = (req, res) => {
   const { name, alpha2Code, alpha3Code, visited } = req.body;
 
-  // Check if the country already exists
-  const existingCountry = countryList.find(
+  const existingCountry = countryData.find(
     (country) =>
       country.alpha2Code === alpha2Code || country.alpha3Code === alpha3Code
   );
@@ -107,24 +72,23 @@ const createCountry = (req, res) => {
       .json({ message: "Country already exists in the list." });
   }
 
-  // Add the new country
   const newCountry = {
-    id: countryList.length + 1,
+    id: countryData.length + 1,
     name: name,
     alpha2Code: alpha2Code,
     alpha3Code: alpha3Code,
     visited: visited || false,
   };
 
-  countryList.push(newCountry);
+  countryData.push(newCountry); // Push to countryData instead of modifying countryList
+  updateCountryDataFile(); // Update the JSON file
   res.status(201).json(newCountry);
 };
 
 const updateCountryByCode = (req, res) => {
-  const code = req.params.code.toUpperCase(); // Convert the code to uppercase
+  const code = req.params.code.toUpperCase();
 
-  // Find the index of the country based on alpha2Code or alpha3Code
-  const countryIndex = countryList.findIndex(
+  const countryIndex = countryData.findIndex(
     (country) => country.alpha2Code === code || country.alpha3Code === code
   );
 
@@ -132,21 +96,19 @@ const updateCountryByCode = (req, res) => {
     return res.status(404).json({ message: "Country not found." });
   }
 
-  // Update the country data
-  countryList[countryIndex] = {
-    ...countryList[countryIndex], // Keep existing properties
-    ...req.body, // Update with new properties
+  countryData[countryIndex] = {
+    ...countryData[countryIndex],
+    ...req.body,
   };
 
-  res.json(countryList[countryIndex]);
+  updateCountryDataFile(); // Update the JSON file
+  res.json(countryData[countryIndex]);
 };
 
 const updateCountryVisitedStatus = (req, res) => {
-  // ... DELETE /api/countries/:code route logic
-  const code = req.params.code.toUpperCase(); // Convert the code to uppercase
+  const code = req.params.code.toUpperCase();
 
-  // Find the index of the country based on alpha2Code or alpha3Code
-  const countryIndex = countryList.findIndex(
+  const countryIndex = countryData.findIndex(
     (country) => country.alpha2Code === code || country.alpha3Code === code
   );
 
@@ -154,10 +116,28 @@ const updateCountryVisitedStatus = (req, res) => {
     return res.status(404).json({ message: "Country not found." });
   }
 
-  // Update the "visited" status of the country
-  countryList[countryIndex].visited = true;
+  countryData[countryIndex].visited = true;
+  
+  updateCountryDataFile(); // Update the JSON file
+  res.json(countryData[countryIndex]);
+};
 
-  res.json(countryList[countryIndex]);
+const displayWishlist = (req, res) => {
+  res.render("wishlist", { countries: countryData });
+};
+
+const addCountry = (req, res) => {
+  const { name, visited } = req.body;
+  const newCountry = {
+    id: countryData.length + 1,
+    name: name,
+    alpha2Code: "", // Add appropriate code generation logic
+    alpha3Code: "", // Add appropriate code generation logic
+    visited: !!visited,
+  };
+  countryData.push(newCountry);
+  updateCountryDataFile();
+  res.redirect("/wishlist");
 };
 
 module.exports = {
@@ -168,4 +148,6 @@ module.exports = {
   createCountry,
   updateCountryByCode,
   updateCountryVisitedStatus,
+  displayWishlist,
+  addCountry,
 };

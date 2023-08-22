@@ -1,4 +1,5 @@
 const express = require("express");
+const router = express.Router();
 const { query, param } = require("express-validator");
 const {
   handleValidationErrors,
@@ -8,9 +9,11 @@ const {
   createCountry,
   updateCountryByCode,
   updateCountryVisitedStatus,
+  displayWishlist,
+  addCountry,
 } = require("../controllers/countriesController"); // Import controller functions and variables
 
-const router = express.Router();
+
 
 // Validation middlewares
 const validateCountryCode = param("code")
@@ -46,5 +49,9 @@ router.delete(
   handleValidationErrors,
   updateCountryVisitedStatus
 );
+
+router.get("/wishlist", displayWishlist);
+
+router.post("/addCountry", addCountry);
 
 module.exports = router;

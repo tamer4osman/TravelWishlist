@@ -1,0 +1,27 @@
+<!-- views/wishlist.ejs -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Country Wishlist</title>
+</head>
+<body>
+    <h1>Country Wishlist</h1>
+    <ul>
+        <% countries.forEach(country => { %>
+            <li><%= country.name %> - Visited: <%= country.visited ? 'Yes' : 'No' %></li>
+        <% }); %>
+    </ul>
+
+    <h2>Add a New Country</h2>
+    <form method="POST" action="/addCountry">
+        <label for="name">Country Name:</label>
+        <input type="text" id="name" name="name" required>
+        <label for="visited">Visited:</label>
+        <input type="checkbox" id="visited" name="visited">
+        <button type="submit">Add Country</button>
+    </form>
+</body>
+</html>

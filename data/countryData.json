@@ -1,0 +1,37 @@
+[
+  {
+    "id": 1,
+    "name": "Bhutan",
+    "alpha2Code": "BT",
+    "alpha3Code": "BTN",
+    "visited": false
+  },
+  {
+    "id": 2,
+    "name": "Canada",
+    "alpha2Code": "CA",
+    "alpha3Code": "CAN",
+    "visited": false
+  },
+  {
+    "id": 3,
+    "name": "Australia",
+    "alpha2Code": "AU",
+    "alpha3Code": "AUS",
+    "visited": true
+  },
+  {
+    "id": 4,
+    "name": "Japan",
+    "alpha2Code": "JP",
+    "alpha3Code": "JPN",
+    "visited": false
+  },
+  {
+    "id": 5,
+    "name": "United Kingdom",
+    "alpha2Code": "GB",
+    "alpha3Code": "GBR",
+    "visited": true
+  }
+]
